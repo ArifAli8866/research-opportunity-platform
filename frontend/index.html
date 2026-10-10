@@ -78,6 +78,85 @@
     </div>
   </main>
 
+  <!-- Details Modal -->
+  <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title fw-bold" id="detailsModalLabel">Research Opportunity Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Spinner while fetching opportunity details -->
+          <div id="detailsModalSpinner" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading details...</span>
+            </div>
+            <p class="text-muted mt-2 mb-0">Loading opportunity details...</p>
+          </div>
+
+          <!-- Loaded Details Content -->
+          <div id="detailsModalContent" class="d-none">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom gap-2">
+              <span id="detailStatusBadge" class="badge badge-status"></span>
+              <span class="badge bg-light text-dark border px-3 py-2">
+                <i class="bi bi-people-fill text-primary me-1"></i>
+                <span id="detailPositions"></span>
+              </span>
+            </div>
+
+            <h3 id="detailTitle" class="h4 fw-bold text-dark mb-3"></h3>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded border h-100">
+                  <span class="text-muted small d-block mb-1">
+                    <i class="bi bi-person-fill me-1"></i> Faculty &amp; Department
+                  </span>
+                  <div id="detailFaculty" class="fw-semibold text-dark"></div>
+                  <div id="detailDepartment" class="text-secondary small"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded border h-100">
+                  <span class="text-muted small d-block mb-1">
+                    <i class="bi bi-tag-fill me-1"></i> Research Area
+                  </span>
+                  <div id="detailResearchArea" class="fw-semibold text-dark"></div>
+                  <div class="text-secondary small mt-1">
+                    <i class="bi bi-calendar-event me-1"></i> Deadline: <strong id="detailDeadline" class="text-dark"></strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fw-bold text-dark mb-2">
+                <i class="bi bi-tools text-primary me-1"></i> Required Skills
+              </h6>
+              <div id="detailRequiredSkills" class="p-3 bg-light rounded border text-secondary" style="white-space: pre-wrap;"></div>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fw-bold text-dark mb-2">
+                <i class="bi bi-file-text-fill text-primary me-1"></i> Project Description
+              </h6>
+              <div id="detailDescription" class="p-3 bg-light rounded border text-secondary" style="white-space: pre-wrap; line-height: 1.6;"></div>
+            </div>
+
+            <div class="text-muted small border-top pt-2 d-flex justify-content-between">
+              <span>Opportunity ID: #<span id="detailId"></span></span>
+              <span>Posted: <span id="detailCreatedAt"></span></span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="py-3 text-center text-muted small">
     <div class="container">

@@ -201,6 +201,58 @@ async function fetchOpportunities() {
   }
 }
 
+/**
+ * Fetches and displays full opportunity details in the modal
+ * @param {number|string} id - Opportunity ID
+ */
+async function viewDetails(id) {
+  const detailsModalEl = document.getElementById('detailsModal');
+  const detailsModal = bootstrap.Modal.getOrCreateInstance(detailsModalEl);
+
+  const spinner = document.getElementById('detailsModalSpinner');
+  const content = document.getElementById('detailsModalContent');
+
+  // Reset view state
+  spinner.classList.remove('d-none');
+  content.classList.add('d-none');
+  detailsModal.show();
+
+  try {
+    const res = await fetch(`${API_BASE}/${id}`);
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Opportunity not found (${res.status})`);
+    }
+
+    const item = await res.json();
+
+    // Populate modal elements safely using textContent (prevents XSS)
+    document.getElementById('detailTitle').textContent = item.title;
+    document.getElementById('detailFaculty').textContent = item.faculty_name;
+    document.getElementById('detailDepartment').textContent = item.department;
+    document.getElementById('detailResearchArea').textContent = item.research_area;
+    document.getElementById('detailDeadline').textContent = formatDate(item.deadline);
+    document.getElementById('detailPositions').textContent = `${item.positions} ${item.positions === 1 ? 'Position' : 'Positions'}`;
+    document.getElementById('detailRequiredSkills').textContent = item.required_skills;
+    document.getElementById('detailDescription').textContent = item.description;
+    document.getElementById('detailId').textContent = item.id;
+    document.getElementById('detailCreatedAt').textContent = item.created_at ? new Date(item.created_at).toLocaleString() : 'N/A';
+
+    // Status badge
+    const statusBadge = document.getElementById('detailStatusBadge');
+    const isOpen = item.status === 'Open';
+    statusBadge.className = `badge badge-status ${isOpen ? 'badge-status-open' : 'badge-status-closed'}`;
+    statusBadge.innerHTML = `<i class="bi ${isOpen ? 'bi-door-open-fill' : 'bi-door-closed-fill'} me-1"></i> ${escapeHTML(item.status)}`;
+
+    // Show content, hide spinner
+    spinner.classList.add('d-none');
+    content.classList.remove('d-none');
+  } catch (error) {
+    detailsModal.hide();
+    showAlert(error.message, 'danger');
+  }
+}
+
 // Initialise event listeners on page load
 document.addEventListener('DOMContentLoaded', () => {
   fetchOpportunities();
@@ -208,6 +260,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
       fetchOpportunities();
+    });
+  }
+
+  // Delegated click handler on opportunities list
+  if (opportunitiesList) {
+    opportunitiesList.addEventListener('click', (event) => {
+      const viewBtn = event.target.closest('.btn-view-details');
+      if (viewBtn) {
+        const id = viewBtn.dataset.id;
+        if (id) viewDetails(id);
+      }
     });
   }
 });
