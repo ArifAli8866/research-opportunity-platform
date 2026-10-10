@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Opportunity Portal</title>
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-mortarboard-fill me-2 fs-4"></i>
+        <span>Research Opportunity Portal</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <div class="ms-auto d-flex align-items-center gap-2 mt-2 mt-lg-0">
+          <button id="addOpportunityBtn" class="btn btn-light fw-semibold d-flex align-items-center">
+            <i class="bi bi-plus-circle-fill text-primary me-2"></i>
+            <span>Add Opportunity</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Floating Toast / Alert Container -->
+  <div id="alertContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Main Content Container -->
+  <main class="container my-4">
+    <!-- Header banner -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+      <div>
+        <h1 class="h3 fw-bold mb-1">Available Opportunities</h1>
+        <p class="text-muted mb-0">Browse and manage academic research positions across faculty and departments.</p>
+      </div>
+      <div class="mt-2 mt-md-0">
+        <button id="refreshBtn" class="btn btn-outline-secondary btn-sm d-flex align-items-center">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="spinner-container">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading opportunities...</span>
+      </div>
+      <p class="text-muted mt-3 mb-0">Loading research opportunities...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state d-none">
+      <div class="empty-state-icon">
+        <i class="bi bi-journal-x"></i>
+      </div>
+      <h3 class="h4 fw-semibold text-dark">No Research Opportunities Found</h3>
+      <p class="text-muted mb-4">There are currently no research opportunities listed in the portal. Click the button below to publish the first listing.</p>
+      <button id="emptyStateAddBtn" class="btn btn-primary px-4">
+        <i class="bi bi-plus-lg me-1"></i> Add First Opportunity
+      </button>
+    </div>
+
+    <!-- Opportunities Cards Grid -->
+    <div id="opportunitiesList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 d-none">
+      <!-- Dynamic Opportunity Cards inserted by app.js -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-3 text-center text-muted small">
+    <div class="container">
+      <p class="mb-0">Research Opportunity Portal &copy; 2026. Built with Node.js, Express, MySQL &amp; Bootstrap 5.</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 Bundle JS CDN (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Application JS -->
+  <script src="js/app.js"></script>
+</body>
+</html>
