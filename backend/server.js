@@ -45,10 +45,18 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+const { notFoundHandler, errorHandler } = require('./src/middleware/errorHandler');
+
 // Root route: Serve frontend index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
+
+// Unknown /api routes handler -> Returns 404 JSON
+app.use('/api', notFoundHandler);
+
+// Global error handler middleware -> Returns 500 JSON and logs error
+app.use(errorHandler);
 
 // Start the Express server
 app.listen(PORT, () => {
