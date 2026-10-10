@@ -253,6 +253,149 @@ async function viewDetails(id) {
   }
 }
 
+/**
+ * Opens the opportunity form in create mode
+ */
+function openCreateModal() {
+  const opportunityModalEl = document.getElementById('opportunityModal');
+  const opportunityForm = document.getElementById('opportunityForm');
+  const formOpportunityId = document.getElementById('formOpportunityId');
+  const opportunityModalLabel = document.getElementById('opportunityModalLabel');
+  const formSubmitText = document.getElementById('formSubmitText');
+  const formStatus = document.getElementById('formStatus');
+
+  opportunityForm.reset();
+  opportunityForm.classList.remove('was-validated');
+  formOpportunityId.value = '';
+  opportunityModalLabel.textContent = 'Add Research Opportunity';
+  formSubmitText.textContent = 'Create Opportunity';
+  if (formStatus) formStatus.value = 'Open';
+
+  bootstrap.Modal.getOrCreateInstance(opportunityModalEl).show();
+}
+
+/**
+ * Opens the opportunity form in edit mode pre-filled with existing data
+ * @param {number|string} id - Opportunity ID
+ */
+async function openEditModal(id) {
+  const opportunityModalEl = document.getElementById('opportunityModal');
+  const opportunityForm = document.getElementById('opportunityForm');
+  const formOpportunityId = document.getElementById('formOpportunityId');
+  const opportunityModalLabel = document.getElementById('opportunityModalLabel');
+  const formSubmitText = document.getElementById('formSubmitText');
+
+  opportunityForm.reset();
+  opportunityForm.classList.remove('was-validated');
+
+  try {
+    const res = await fetch(`${API_BASE}/${id}`);
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Failed to fetch opportunity (${res.status})`);
+    }
+
+    const item = await res.json();
+
+    formOpportunityId.value = item.id;
+    document.getElementById('formTitle').value = item.title;
+    document.getElementById('formResearchArea').value = item.research_area;
+    document.getElementById('formFacultyName').value = item.faculty_name;
+    document.getElementById('formDepartment').value = item.department;
+    document.getElementById('formPositions').value = item.positions;
+    document.getElementById('formDeadline').value = String(item.deadline).split('T')[0];
+    document.getElementById('formStatus').value = item.status;
+    document.getElementById('formRequiredSkills').value = item.required_skills;
+    document.getElementById('formDescription').value = item.description;
+
+    opportunityModalLabel.textContent = 'Edit Research Opportunity';
+    formSubmitText.textContent = 'Save Changes';
+
+    bootstrap.Modal.getOrCreateInstance(opportunityModalEl).show();
+  } catch (error) {
+    showAlert(error.message, 'danger');
+  }
+}
+
+/**
+ * Handles form submission for both create and update
+ * @param {Event} e
+ */
+async function handleOpportunityFormSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('opportunityForm');
+  const formPositions = document.getElementById('formPositions');
+  const formDeadline = document.getElementById('formDeadline');
+  const formOpportunityId = document.getElementById('formOpportunityId');
+  const formSubmitBtn = document.getElementById('formSubmitBtn');
+  const formSubmitSpinner = document.getElementById('formSubmitSpinner');
+
+  // Client-side validation
+  const posVal = parseInt(formPositions.value, 10);
+  const isPosValid = !isNaN(posVal) && posVal > 0;
+  const isDeadlineValid = Boolean(formDeadline.value);
+
+  if (!form.checkValidity() || !isPosValid || !isDeadlineValid) {
+    form.classList.add('was-validated');
+    return;
+  }
+
+  const id = formOpportunityId.value;
+  const isEdit = Boolean(id);
+  const url = isEdit ? `${API_BASE}/${id}` : API_BASE;
+  const method = isEdit ? 'PUT' : 'POST';
+
+  const payload = {
+    title: document.getElementById('formTitle').value.trim(),
+    description: document.getElementById('formDescription').value.trim(),
+    research_area: document.getElementById('formResearchArea').value.trim(),
+    faculty_name: document.getElementById('formFacultyName').value.trim(),
+    department: document.getElementById('formDepartment').value.trim(),
+    required_skills: document.getElementById('formRequiredSkills').value.trim(),
+    positions: posVal,
+    deadline: formDeadline.value,
+    status: document.getElementById('formStatus').value
+  };
+
+  // Button loading state
+  formSubmitBtn.disabled = true;
+  formSubmitSpinner.classList.remove('d-none');
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw {
+        message: data.error || (isEdit ? 'Failed to update opportunity' : 'Failed to create opportunity'),
+        details: data.details || []
+      };
+    }
+
+    // Hide modal and show success alert
+    const opportunityModalEl = document.getElementById('opportunityModal');
+    bootstrap.Modal.getOrCreateInstance(opportunityModalEl).hide();
+
+    showAlert(
+      isEdit ? 'Opportunity updated successfully.' : 'Opportunity created successfully.',
+      'success'
+    );
+
+    // Refresh listing
+    fetchOpportunities();
+  } catch (error) {
+    showAlert(error.message || 'Operation failed', 'danger', error.details || []);
+  } finally {
+    formSubmitBtn.disabled = false;
+    formSubmitSpinner.classList.add('d-none');
+  }
+}
+
 // Initialise event listeners on page load
 document.addEventListener('DOMContentLoaded', () => {
   fetchOpportunities();
@@ -263,6 +406,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Add Opportunity buttons
+  const addBtn = document.getElementById('addOpportunityBtn');
+  if (addBtn) addBtn.addEventListener('click', openCreateModal);
+
+  const emptyStateAddBtn = document.getElementById('emptyStateAddBtn');
+  if (emptyStateAddBtn) emptyStateAddBtn.addEventListener('click', openCreateModal);
+
+  // Form submission handler
+  const form = document.getElementById('opportunityForm');
+  if (form) form.addEventListener('submit', handleOpportunityFormSubmit);
+
   // Delegated click handler on opportunities list
   if (opportunitiesList) {
     opportunitiesList.addEventListener('click', (event) => {
@@ -270,6 +424,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (viewBtn) {
         const id = viewBtn.dataset.id;
         if (id) viewDetails(id);
+        return;
+      }
+
+      const editBtn = event.target.closest('.btn-edit');
+      if (editBtn) {
+        const id = editBtn.dataset.id;
+        if (id) openEditModal(id);
+        return;
       }
     });
   }
