@@ -17,4 +17,7 @@ router.get('/:id', opportunityController.getOpportunityById);
 // POST /api/opportunities -> Create a new opportunity
 router.post('/', opportunityController.createOpportunity);
 
+// PUT /api/opportunities/:id -> Update an existing opportunity
+router.put('/:id', opportunityController.updateOpportunity);
+
 module.exports = router;

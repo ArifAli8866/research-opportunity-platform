@@ -102,8 +102,67 @@ const getOpportunityById = async (req, res, next) => {
   }
 };
 
+/**
+ * Update an existing research opportunity
+ * PUT /api/opportunities/:id
+ * Returns 200 with the updated opportunity record, or 404 if not found
+ */
+const updateOpportunity = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // First check if the record exists
+    const [existing] = await db.query('SELECT * FROM opportunities WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ error: 'Opportunity not found' });
+    }
+
+    const allowedFields = [
+      'title',
+      'description',
+      'research_area',
+      'faculty_name',
+      'department',
+      'required_skills',
+      'positions',
+      'deadline',
+      'status'
+    ];
+
+    const updates = [];
+    const values = [];
+
+    // Dynamically build SET clauses based on supplied fields
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates.push(`${field} = ?`);
+        if (field === 'positions') {
+          values.push(parseInt(req.body[field], 10));
+        } else if (typeof req.body[field] === 'string') {
+          values.push(req.body[field].trim());
+        } else {
+          values.push(req.body[field]);
+        }
+      }
+    }
+
+    // Append ID for the WHERE clause
+    values.push(id);
+
+    const updateSql = `UPDATE opportunities SET ${updates.join(', ')} WHERE id = ?`;
+    await db.query(updateSql, values);
+
+    // Fetch and return the updated record
+    const [updatedRows] = await db.query('SELECT * FROM opportunities WHERE id = ?', [id]);
+    return res.status(200).json(updatedRows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createOpportunity,
   getAllOpportunities,
-  getOpportunityById
+  getOpportunityById,
+  updateOpportunity
 };
