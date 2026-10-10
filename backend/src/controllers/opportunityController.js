@@ -66,6 +66,44 @@ const createOpportunity = async (req, res, next) => {
   }
 };
 
+/**
+ * Retrieve all research opportunities
+ * GET /api/opportunities
+ * Returns 200 with an array of opportunities
+ */
+const getAllOpportunities = async (req, res, next) => {
+  try {
+    const [rows] = await db.query(
+      'SELECT * FROM opportunities ORDER BY created_at DESC'
+    );
+    return res.status(200).json(rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Retrieve a single research opportunity by ID
+ * GET /api/opportunities/:id
+ * Returns 200 with the opportunity record, or 404 if not found
+ */
+const getOpportunityById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.query('SELECT * FROM opportunities WHERE id = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Opportunity not found' });
+    }
+
+    return res.status(200).json(rows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
-  createOpportunity
+  createOpportunity,
+  getAllOpportunities,
+  getOpportunityById
 };
