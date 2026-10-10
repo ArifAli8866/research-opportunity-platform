@@ -396,6 +396,83 @@ async function handleOpportunityFormSubmit(e) {
   }
 }
 
+/**
+ * Closes applications for an open opportunity
+ * @param {number|string} id - Opportunity ID
+ */
+async function closeOpportunity(id) {
+  const closeBtn = document.querySelector(`.btn-close-opp[data-id="${id}"]`);
+  if (closeBtn) closeBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Closed' })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to close opportunity');
+    }
+
+    showAlert('Opportunity status updated to Closed.', 'success');
+    fetchOpportunities();
+  } catch (error) {
+    if (closeBtn) closeBtn.disabled = false;
+    showAlert(error.message, 'danger');
+  }
+}
+
+/**
+ * Opens the delete confirmation modal
+ * @param {number|string} id - Opportunity ID
+ * @param {string} title - Opportunity Title
+ */
+function openDeleteModal(id, title) {
+  document.getElementById('deleteOpportunityId').value = id;
+  document.getElementById('deleteOpportunityTitle').textContent = title || `#${id}`;
+  const modalEl = document.getElementById('deleteConfirmModal');
+  bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+/**
+ * Executes the deletion of an opportunity after confirmation
+ */
+async function confirmDelete() {
+  const id = document.getElementById('deleteOpportunityId').value;
+  const modalEl = document.getElementById('deleteConfirmModal');
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  const spinner = document.getElementById('deleteSpinner');
+
+  if (!id) return;
+
+  confirmBtn.disabled = true;
+  spinner.classList.remove('d-none');
+
+  try {
+    const res = await fetch(`${API_BASE}/${id}`, {
+      method: 'DELETE'
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to delete opportunity');
+    }
+
+    bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+    showAlert(data.message || 'Opportunity deleted successfully.', 'success');
+    fetchOpportunities();
+  } catch (error) {
+    showAlert(error.message, 'danger');
+  } finally {
+    confirmBtn.disabled = false;
+    spinner.classList.add('d-none');
+  }
+}
+
 // Initialise event listeners on page load
 document.addEventListener('DOMContentLoaded', () => {
   fetchOpportunities();
@@ -417,6 +494,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('opportunityForm');
   if (form) form.addEventListener('submit', handleOpportunityFormSubmit);
 
+  // Confirm delete button handler
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', confirmDelete);
+
   // Delegated click handler on opportunities list
   if (opportunitiesList) {
     opportunitiesList.addEventListener('click', (event) => {
@@ -431,6 +512,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (editBtn) {
         const id = editBtn.dataset.id;
         if (id) openEditModal(id);
+        return;
+      }
+
+      const closeBtn = event.target.closest('.btn-close-opp');
+      if (closeBtn) {
+        const id = closeBtn.dataset.id;
+        if (id) closeOpportunity(id);
+        return;
+      }
+
+      const deleteBtn = event.target.closest('.btn-delete');
+      if (deleteBtn) {
+        const id = deleteBtn.dataset.id;
+        const title = deleteBtn.dataset.title;
+        if (id) openDeleteModal(id, title);
         return;
       }
     });
