@@ -15,6 +15,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const db = require('./src/config/db');
+const opportunityRoutes = require('./src/routes/opportunityRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +30,9 @@ app.use(express.urlencoded({ extended: true }));
 // Serve frontend static assets (HTML, CSS, JS) from the frontend/ folder
 const frontendPath = path.resolve(__dirname, '../frontend');
 app.use(express.static(frontendPath));
+
+// API Routes
+app.use('/api/opportunities', opportunityRoutes);
 
 // Health check endpoint to verify backend and database connectivity
 app.get('/api/health', async (req, res) => {
