@@ -20,4 +20,7 @@ router.post('/', opportunityController.createOpportunity);
 // PUT /api/opportunities/:id -> Update an existing opportunity
 router.put('/:id', opportunityController.updateOpportunity);
 
+// DELETE /api/opportunities/:id -> Delete an opportunity
+router.delete('/:id', opportunityController.deleteOpportunity);
+
 module.exports = router;

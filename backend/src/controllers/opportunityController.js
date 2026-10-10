@@ -160,9 +160,34 @@ const updateOpportunity = async (req, res, next) => {
   }
 };
 
+/**
+ * Delete a research opportunity by ID
+ * DELETE /api/opportunities/:id
+ * Returns 200 with a success message, or 404 if not found
+ */
+const deleteOpportunity = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // First check if the record exists
+    const [existing] = await db.query('SELECT id FROM opportunities WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ error: 'Opportunity not found' });
+    }
+
+    // Delete the opportunity using a parameterized query
+    await db.query('DELETE FROM opportunities WHERE id = ?', [id]);
+
+    return res.status(200).json({ message: 'Opportunity deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createOpportunity,
   getAllOpportunities,
   getOpportunityById,
-  updateOpportunity
+  updateOpportunity,
+  deleteOpportunity
 };
