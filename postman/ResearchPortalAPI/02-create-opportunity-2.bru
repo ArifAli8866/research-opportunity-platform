@@ -1,0 +1,34 @@
+meta {
+  name: Create Opportunity #2
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/opportunities
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Quantum Error Correction Algorithms",
+    "description": "Design and simulate fault-tolerant quantum error correction codes using surface codes and stabilizer formalisms.",
+    "research_area": "Quantum Computing",
+    "faculty_name": "Prof. David Chen",
+    "department": "Department of Physics & Electrical Engineering",
+    "required_skills": "Linear Algebra, Quantum Circuits, Qiskit, Python",
+    "positions": 1,
+    "deadline": "2026-12-15"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isDefined
+  res.body.title: eq "Quantum Error Correction Algorithms"
+}

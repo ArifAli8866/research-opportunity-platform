@@ -1,0 +1,30 @@
+meta {
+  name: Create with Invalid Data
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/opportunities
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "",
+    "description": "",
+    "positions": -1,
+    "deadline": "invalid-date"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq "Validation failed"
+  res.body.details: isDefined
+}

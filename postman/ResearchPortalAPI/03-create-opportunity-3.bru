@@ -1,0 +1,34 @@
+meta {
+  name: Create Opportunity #3
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/opportunities
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Zero-Knowledge Cryptography for Blockchain",
+    "description": "Research recursive zk-SNARK proof systems to enhance privacy and scalability in decentralized systems.",
+    "research_area": "Cybersecurity & Cryptography",
+    "faculty_name": "Dr. Elena Rostova",
+    "department": "Department of Computer Science",
+    "required_skills": "Cryptography, Rust, Mathematics, Distributed Systems",
+    "positions": 3,
+    "deadline": "2026-10-31"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isDefined
+  res.body.title: eq "Zero-Knowledge Cryptography for Blockchain"
+}

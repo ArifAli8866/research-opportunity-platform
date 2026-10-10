@@ -1,0 +1,16 @@
+meta {
+  name: Delete Opportunity
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/opportunities/1
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.message: eq "Opportunity deleted successfully"
+}

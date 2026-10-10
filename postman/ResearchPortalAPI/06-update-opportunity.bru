@@ -1,0 +1,30 @@
+meta {
+  name: Update Opportunity
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/opportunities/1
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Deep Learning & Vision Transformers for Robotics",
+    "required_skills": "Python, PyTorch, ROS2, HuggingFace, C++, CUDA",
+    "positions": 4,
+    "deadline": "2026-12-31"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: eq "Deep Learning & Vision Transformers for Robotics"
+  res.body.positions: eq 4
+}
